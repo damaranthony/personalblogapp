@@ -1,0 +1,17 @@
+Deploy database
+1. Open SQL management studio (SQL 2012)
+2. Create a new database named  "TestBlog"
+3. Once the database is created, right click on it and restore the .bak file under /Database folder.
+
+Deploy website
+1. Open Web.config file inside /WebFiles folder. 
+2. Update the connection strings credentials
+<add name="BlogContext" connectionString="data source=;initial catalog=TestBlog;user id=;password=;MultipleActiveResultSets=True;App=EntityFramework" providerName="System.Data.SqlClient" />
+
+2.a. Update "data source=[your database server]"
+2.b. Update "user id=[your database user name]"
+2.c. Update "password=[your database password]"
+
+3. Open IIS and create a new website or add a new application under your default website
+4. If you're adding a new website, make sure to add a new entry under your host file. Located at C:\Windows\System32\drivers\etc\hosts
+5. For your website path, locate the folder where you saved /WebFiles folder from the repository.
