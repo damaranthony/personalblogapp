@@ -364,6 +364,9 @@
     <Content Include="Views\Blog\_CreateEditForm.cshtml" />
     <Content Include="Views\Blog\Publish.cshtml" />
     <Content Include="Views\Blog\Manage.cshtml" />
+    <Content Include="Views\Manage\Users.cshtml" />
+    <Content Include="Views\Manage\Permissions.cshtml" />
+    <Content Include="Views\Manage\Roles.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

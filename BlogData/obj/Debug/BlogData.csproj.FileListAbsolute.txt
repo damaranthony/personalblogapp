@@ -8,3 +8,13 @@ F:\Test Project\TestBlog\BlogData\bin\Debug\EntityFramework.SqlServer.xml
 F:\Test Project\TestBlog\BlogData\obj\Debug\BlogData.csprojResolveAssemblyReference.cache
 F:\Test Project\TestBlog\BlogData\obj\Debug\BlogData.dll
 F:\Test Project\TestBlog\BlogData\obj\Debug\BlogData.pdb
+F:\Test Project\Repository\testblog\BlogData\bin\Debug\BlogData.dll.config
+F:\Test Project\Repository\testblog\BlogData\bin\Debug\BlogData.dll
+F:\Test Project\Repository\testblog\BlogData\bin\Debug\BlogData.pdb
+F:\Test Project\Repository\testblog\BlogData\bin\Debug\EntityFramework.dll
+F:\Test Project\Repository\testblog\BlogData\bin\Debug\EntityFramework.SqlServer.dll
+F:\Test Project\Repository\testblog\BlogData\bin\Debug\EntityFramework.xml
+F:\Test Project\Repository\testblog\BlogData\bin\Debug\EntityFramework.SqlServer.xml
+F:\Test Project\Repository\testblog\BlogData\obj\Debug\BlogData.csprojResolveAssemblyReference.cache
+F:\Test Project\Repository\testblog\BlogData\obj\Debug\BlogData.dll
+F:\Test Project\Repository\testblog\BlogData\obj\Debug\BlogData.pdb

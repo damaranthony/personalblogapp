@@ -16,7 +16,7 @@ namespace BlogData.DAL
         internal DbSet<TEntity> DbSet;
 
         private string _errorMessage = string.Empty;
-
+        
         public GenericRepository(BlogContext c)
         {
             Context = c;

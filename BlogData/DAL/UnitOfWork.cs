@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using BlogData.Data;
@@ -17,13 +18,15 @@ namespace BlogData.DAL
         private GenericRepository<Content> _contentRepository;
         private GenericRepository<ContentHistory> _contentHistoryRepository;
         private GenericRepository<ContentState> _contentStateRepository;
-        private GenericRepository<ContentStateToRole> _contentStateToRoleRepository; 
-        
+
+        private ContentStateToRoleDal _contentStateToRoleRepository;
+       
         //initialize public repository
         public GenericRepository<Content> ContentRepository => _contentRepository ?? (_contentRepository = new GenericRepository<Content>(_context));
         public GenericRepository<ContentHistory> ContentHistoryRepository => _contentHistoryRepository ?? (_contentHistoryRepository = new GenericRepository<ContentHistory>(_context));
         public GenericRepository<ContentState> ContentStateRepository => _contentStateRepository ?? (_contentStateRepository = new GenericRepository<ContentState>(_context));
-        public GenericRepository<ContentStateToRole> ContentStateToRoleRepository => _contentStateToRoleRepository ?? (_contentStateToRoleRepository = new GenericRepository<ContentStateToRole>(_context));
+        
+        public ContentStateToRoleDal ContentStateToRoleRepository => _contentStateToRoleRepository ?? (_contentStateToRoleRepository = new ContentStateToRoleDal(_context));
 
         public void Save()
         {

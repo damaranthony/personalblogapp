@@ -196,6 +196,8 @@ namespace TestBlog.Controllers
             {
                 ContentId = tempBlog?.Id ?? blogPost.Id, //check if record exist
                 CreatedBy = User.Identity.GetUserId(),
+                MainContent = Server.HtmlEncode(blogPost.MainContent),
+                Title = blogPost.Title,
                 CreatedDate = DateTime.Now,
                 ContentStateId = cType == ContentStateType.Draft ? 1 : 2 //check if save for draft or publish
             };
