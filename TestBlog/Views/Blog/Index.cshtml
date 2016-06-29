@@ -6,11 +6,14 @@
 
 <h2>Blog posts</h2>
 
-@foreach (var b in Model)
+@if (Model.Any())
 {
-    <div>
-        <h3>@Html.ActionLink(b.Title, "Details", new {id = b.Id})</h3>
+    foreach (var b in Model)
+    {
+        <div>
+            <h3>@Html.ActionLink(b.Title, "Details", new { id = b.Id })</h3>
 
-        @(b.MainContent.Length > 100 ? Html.Raw(Server.HtmlDecode(b.MainContent.Substring(0, 100) + " ...")) : Html.Raw(Server.HtmlDecode(b.MainContent)))
-    </div>
+            @(b.MainContent.Length > 100 ? Html.Raw(Server.HtmlDecode(b.MainContent.Substring(0, 100) + " ...")) : Html.Raw(Server.HtmlDecode(b.MainContent)))
+        </div>
+    }
 }

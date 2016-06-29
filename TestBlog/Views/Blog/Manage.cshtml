@@ -18,24 +18,32 @@
         </tr>
     </thead>
     <tbody>
-    @foreach (var b in Model)
+    @if (Model.Any())
     {
-        <tr>
-            <td>@Html.ActionLink(b.Title, "Details", new {id = b.Id})</td>
-            <td>
-
-                @{
-                    var tempObj = b.ContentHistories.OrderByDescending(o => o.CreatedDate).FirstOrDefault();
-                }
-                @if (tempObj != null)
-                {
-                    @tempObj.ContentState.Title
-                }
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { id = b.Id })
-            </td>
-        </tr>
+        foreach (var b in Model)
+        {
+            <tr>
+                <td>@Html.ActionLink(b.Title, "Details", new { id = b.Id })</td>
+                <td>
+                    @{
+                        var tempObj = b.ContentHistories.OrderByDescending(o => o.CreatedDate).FirstOrDefault();
+                        if (tempObj != null)
+                        {
+                            @tempObj.ContentState.Title
+                        }
+                    }
+                </td>
+                <td>
+                    <a href="@Url.Action("Edit", "Blog", new { id = b.Id})" title="Edit Blog Post">
+                        <span class="glyphicon glyphicon-edit"></span>
+                    </a>
+                    @*<a href="@Url.Action("Edit", "Edit", new {roleid = b.Id})" title="Edit Blog Post">
+                        <span class="glyphicon glyphicon-edit"></span>
+                    </a>*@
+                </td>
+            </tr>
+        }
     }
+    
     </tbody>
 </table>

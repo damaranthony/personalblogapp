@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Helpers;
 using System.Web.Mvc;
+using System.Web.Security;
 
 using BlogData.DAL;
 using BlogData.Data;
@@ -46,7 +48,7 @@ namespace TestBlog.Controllers
         // POST: Blog/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [ValidateInput(false)]
+        [ValidateInput(false)] //to accept html codes from form
         public ActionResult Create(Content blogPost, string submit)
         {
             try
@@ -60,7 +62,7 @@ namespace TestBlog.Controllers
                             return RedirectToAction("Edit", new { id = blogPost.Id });
                         case "Publish":
                             SaveBlogPost(blogPost, ContentStateType.ReadyToPublish);
-                            return RedirectToAction("Details", new { id = blogPost.Id, title = blogPost.Title });
+                            return RedirectToAction("Publish", new { id = blogPost.Id, title = blogPost.Title });
                         default: //cancel
                             return RedirectToAction("Manage", "Blog");
                     }
@@ -81,13 +83,16 @@ namespace TestBlog.Controllers
         {
             try
             {
+                var blogPostHistory = _blogUnitOfWork.ContentHistoryRepository.GetLatestContentHistory(id);
+
+                if (blogPostHistory == null) return View();
+                //check if the content is ready for review
+                if(blogPostHistory.ContentState.Title == "Ready to publish")
+                    return RedirectToAction("Publish", new { id = blogPostHistory.ContentId, title = blogPostHistory.Title });
+
                 var blogPost = _blogUnitOfWork.ContentRepository.GetById(id);
+                blogPost.MainContent = HttpContext.Server.HtmlDecode(blogPost.MainContent);
 
-                if (blogPost == null)
-                    return View();
-               
-
-                blogPost.MainContent = Server.HtmlDecode(blogPost.MainContent);
                 return View(blogPost);
                
             }
@@ -100,13 +105,19 @@ namespace TestBlog.Controllers
         //to do: authorize for admin only
         public ActionResult Publish(int? id)
         {
-            //check if url parameter has a value
-            //return blog post details if there's an id
-            return id == null ? View() : View(_blogUnitOfWork.ContentRepository.GetById(id));
+            if (id == null) return View();
+
+            var blogPostHistory = _blogUnitOfWork.ContentHistoryRepository.GetLatestContentHistory(id.Value);
+            
+            if(blogPostHistory.ContentState.Title == "Published")
+                return RedirectToAction("Details", new { id = blogPostHistory.ContentId, title = blogPostHistory.Title });
+            else
+                return View(_blogUnitOfWork.ContentRepository.GetById(id));
         }
 
         //to do: authorize for admin only
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Publish(Content blogPost)
         {
             try
@@ -123,16 +134,17 @@ namespace TestBlog.Controllers
 
                 var blogHistory = new ContentHistory
                 {
-                    ContentId = tempPost.Id, //check if record exist
+                    ContentId = blogPost.Id, //check if record exist
                     CreatedBy = User.Identity.GetUserId(),
                     CreatedDate = DateTime.Now,
                     ContentStateId = 4 //published
                 };
 
                 _blogUnitOfWork.ContentHistoryRepository.Insert(blogHistory);
-
                 _blogUnitOfWork.Save();
-                return View();
+
+
+                return RedirectToAction("Details", new { id = tempPost.Id, title = tempPost.Title });
             }
             catch
             {

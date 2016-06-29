@@ -4,6 +4,8 @@
 {
     @Html.AntiForgeryToken()
     
+    @Html.HiddenFor(m => m.Id)
+
 
     <div class="form-group">
         @Html.LabelFor(m => m.Title)
@@ -21,8 +23,11 @@
     @Html.ValidationSummary("", new { @class = "text-danger" })
 
     <div class="form-group">
-            <input type="submit" name="submit" value="Save as Draft" class="btn btn-default" />
-            <input type="submit" name="submit" value="Publish" class="btn btn-default" />
-            <input type="submit" name="submit" value="Cancel" class="btn btn-link" />
+        <input type="submit" name="submit" value="Save as Draft" class="btn btn-default" />
+        @if (Roles.IsUserInRole("Admin"))
+        {
+            <input type="submit" name="submit" value="Publish" class="btn btn-primary" />
+        }
+        <input type="submit" name="submit" value="Cancel" class="btn btn-link" />
     </div>
 }

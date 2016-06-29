@@ -33,6 +33,9 @@ namespace BlogData.Data
         [StringLength(128)]
         public string UpdatedBy { get; set; }
 
+        [StringLength(128)]
+        public string Author { get; set; }
+
         public DateTime? UpdatedDate { get; set; }
 
         public bool? IsDeleted { get; set; }

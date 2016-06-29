@@ -42,16 +42,15 @@ namespace TestBlog
                 roleManager.Create(role);
             }
 
-            if (!unitOfWork.ContentStateRepository.GetAll().Any())
-            {
-                unitOfWork.ContentStateRepository.Insert(new ContentState { Title = "Draft", CreatedDate = DateTime.Now, IsDeleted = false });
-                unitOfWork.ContentStateRepository.Insert(new ContentState { Title = "Ready to publish", CreatedDate = DateTime.Now, IsDeleted = false });
-                unitOfWork.ContentStateRepository.Insert(new ContentState { Title = "Reject", CreatedDate = DateTime.Now, IsDeleted = false });
-                unitOfWork.ContentStateRepository.Insert(new ContentState { Title = "Published", CreatedDate = DateTime.Now, IsDeleted = false });
-                unitOfWork.ContentStateRepository.Insert(new ContentState { Title = "Archived", CreatedDate = DateTime.Now, IsDeleted = false });
+            if (unitOfWork.ContentStateRepository.GetAll().Any()) return;
 
-                unitOfWork.Save();
-            }
+            unitOfWork.ContentStateRepository.Insert(new ContentState { Title = "Draft", CreatedDate = DateTime.Now, IsDeleted = false });
+            unitOfWork.ContentStateRepository.Insert(new ContentState { Title = "Ready to publish", CreatedDate = DateTime.Now, IsDeleted = false });
+            unitOfWork.ContentStateRepository.Insert(new ContentState { Title = "Reject", CreatedDate = DateTime.Now, IsDeleted = false });
+            unitOfWork.ContentStateRepository.Insert(new ContentState { Title = "Published", CreatedDate = DateTime.Now, IsDeleted = false });
+            unitOfWork.ContentStateRepository.Insert(new ContentState { Title = "Archived", CreatedDate = DateTime.Now, IsDeleted = false });
+
+            unitOfWork.Save();
         }
     }
 }

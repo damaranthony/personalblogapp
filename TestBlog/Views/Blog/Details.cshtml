@@ -4,17 +4,20 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>@Html.Raw(Model.Title)</h1>
+@if (Model != null)
+{
+    <h1>@Html.Raw(Model.Title)</h1>
+    
+    <div style="padding:5% 0;">
+        @Html.Raw(Server.HtmlDecode(Model.MainContent))
+    </div>
+
+    <div>
+        Last Updated: @Html.Raw(Model.PublishDate)
+    </div>
+}
 
 
-
-<div style="padding:5% 0;">
-    @Html.Raw(Server.HtmlDecode(Model.MainContent))
-</div>
-
-<div>
-   Last Updated: @Html.Raw(Model.PublishDate)
-</div>
 
 
 

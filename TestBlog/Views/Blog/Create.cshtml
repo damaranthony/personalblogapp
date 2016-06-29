@@ -18,12 +18,6 @@
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 
-
-    <script src='//cdn.tinymce.com/4/tinymce.min.js'></script>
-
-    <script type="text/javascript" src="~/Scripts/moment.min.js"></script>
-    <script type="text/javascript" src="~/Scripts/bootstrap-datetimepicker.min.js"></script>
-    
     <script>
         $(document).ready(function () { 
             tinymce.init({
@@ -32,7 +26,7 @@
                 height: "250"
             });
 
-            $('.datepicker').datetimepicker();
+            
         });
     </script>
 }

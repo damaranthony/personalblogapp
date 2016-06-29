@@ -288,6 +288,7 @@ namespace TestBlog.Controllers
             return View(UserManager.Users);
         }
 
+        [Authorize(Roles = "Admin")]
         public ActionResult Roles()
         {
             var context = new ApplicationDbContext();

@@ -11,8 +11,8 @@ namespace BlogData.DAL
  
     public class ContentStateToRoleDal : GenericRepository<ContentStateToRole>
     {
-        internal BlogContext Context;
-        internal DbSet<ContentStateToRole> DbSet;
+        internal new BlogContext Context;
+        internal new DbSet<ContentStateToRole> DbSet;
         public ContentStateToRoleDal(BlogContext c) : base(c)
         {
             Context = c;

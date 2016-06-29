@@ -3,36 +3,54 @@
     ViewBag.Title = "Publish Blog Post";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<h1>Publish Blog</h1>
 
-<h2>@Html.Raw(Model.Title)</h2>
+<div class="content">
+    <div class="col-md-12">
+        @if (Model != null)
+        {
+            using (Html.BeginForm("Publish", "Blog", FormMethod.Post, new {@class = "form-horizontal", role = "form", style = "padding-bottom:2%;"}))
+            {
+                @Html.AntiForgeryToken()
 
-<div style="padding:5% 0;">
-    @Html.Raw(Server.HtmlDecode(Model.MainContent))
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ContentHistories.OrderByDescending(c => c.CreatedDate).FirstOrDefault().Comment)
+
+                    @Html.TextAreaFor(m => m.ContentHistories.OrderByDescending(c => c.CreatedDate).FirstOrDefault().Comment, new {@class = "form-control"})
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.PublishDate)
+
+                    @Html.TextBoxFor(m => m.PublishDate, new {@class = "form-control datepicker"})
+                    @Html.ValidationMessageFor(m => m.PublishDate)
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" name="submit" value="Approve" class="btn btn-default"/>
+                    <input type="submit" name="submit" value="Reject" class="btn btn-default"/>
+                    <input type="submit" name="submit" value="Cancel" class="btn btn-link"/>
+                </div>
+            }
+
+            <h2>@Html.Raw(Model.Title)</h2>
+
+            <div style="padding: 5% 0;">
+                @Html.Raw(Server.HtmlDecode(Model.MainContent))
+            </div>
+
+            <div>
+                Last Updated: @Html.Raw(Model.UpdatedDate)
+            </div>
+
+        }
+    </div>
 </div>
 
-<div>
-    Last Updated: @Html.Raw(Model.PublishDate)
-</div>
-@using (Html.BeginForm("Publish", "Blog", FormMethod.Post, new { @class = "form-horizontal", role = "form", style = "padding-top:10%;" }))
-{
-    @Html.AntiForgeryToken()
-
-    <div class="form-group">
-        @Html.LabelFor(m => m.ContentHistories.OrderByDescending(c => c.CreatedDate).FirstOrDefault().Comment)
-
-        @Html.TextAreaFor(m => m.ContentHistories.OrderByDescending(c => c.CreatedDate).FirstOrDefault().Comment, new {@class = "form-control"})
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(m => m.PublishDate)
-
-        @Html.TextBoxFor(m => m.PublishDate, new {@class = "form-control datepicker"})
-        @Html.ValidationMessageFor(m => m.PublishDate)
-    </div>
-
-    <div class="form-group">
-        <input type="submit" name="submit" value="Approve" class="btn btn-default" />
-        <input type="submit" name="submit" value="Reject" class="btn btn-default" />
-        <input type="submit" name="submit" value="Cancel" class="btn btn-link" />
-    </div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.datepicker').datetimepicker();
+        });
+    </script>
 }
-
