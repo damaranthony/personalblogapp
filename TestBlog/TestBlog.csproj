@@ -366,7 +366,7 @@
     <Content Include="Views\Blog\Manage.cshtml" />
     <Content Include="Views\Manage\Users.cshtml" />
     <Content Include="Views\Manage\Permissions.cshtml" />
-    <Content Include="Views\Manage\Roles.cshtml" />
+    <Content Include="Views\Manage\UserRoles.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

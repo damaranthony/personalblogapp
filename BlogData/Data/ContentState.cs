@@ -1,3 +1,5 @@
+using BlogData.DAL;
+
 namespace BlogData.Data
 {
     using System;
@@ -37,14 +39,6 @@ namespace BlogData.Data
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ContentStateToRole> ContentStateToRoles { get; set; }
-    }
-
-    public enum ContentStateType
-    {
-        Draft, 
-        ReadyToPublish,
-        Reject,
-        Published,
-        Archived
+        
     }
 }

@@ -5,6 +5,8 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using BlogData.Data;
+using BlogData.DAL;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
@@ -17,6 +19,8 @@ namespace TestBlog.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+
+        private readonly UnitOfWork _unitOfWork = new UnitOfWork();
 
         public AccountController()
         {
@@ -149,24 +153,26 @@ namespace TestBlog.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return View(model);
+            
+            var user = new ApplicationUser { UserName = model.Email, Email = model.Email, LockoutEnabled = false };
+            var result = await UserManager.CreateAsync(user, model.Password);
+            if (result.Succeeded)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                var result = await UserManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
+                //await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
+                var author = new Author
                 {
-                    //await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    
-                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    UserId = user.Id,
+                    Name = model.Name,
+                    IsDeleted = false
+                };
+                //create author record
+                _unitOfWork.AuthorRepository.Insert(author);
+                _unitOfWork.Save();
 
-                    return RedirectToAction("Users", "Manage");
-                }
-                AddErrors(result);
+                return RedirectToAction("Users", "Manage");
             }
+            AddErrors(result);
 
             // If we got this far, something failed, redisplay form
             return View(model);
@@ -385,7 +391,38 @@ namespace TestBlog.Controllers
             return View(model);
         }
 
-        //
+        public async Task<ActionResult> Suspend(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id)) return RedirectToAction("Users", "Manage");
+
+            var user = await UserManager.FindByIdAsync(id);
+            if (user == null) return RedirectToAction("Users", "Manage");
+
+
+            user.LockoutEnabled = true;
+            await UserManager.UpdateAsync(user);
+            
+            TempData["User"] = "User account has been suspended!";
+
+            return RedirectToAction("Users", "Manage");
+        }
+
+        public async Task<ActionResult> Activate(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id)) return RedirectToAction("Users", "Manage");
+
+            var user = await UserManager.FindByIdAsync(id);
+            if (user == null) return RedirectToAction("Users", "Manage");
+            
+            user.LockoutEnabled = false;
+            await UserManager.UpdateAsync(user);
+
+            TempData["User"] = "User account has been activated!";
+
+            return RedirectToAction("Users", "Manage");
+        }
+
+
         // POST: /Account/LogOff
         [HttpPost]
         [ValidateAntiForgeryToken]

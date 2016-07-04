@@ -9,7 +9,6 @@ namespace BlogData.Data
     [Table("ContentStateToRole")]
     public partial class ContentStateToRole
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
 
         public int ContentStateId { get; set; }

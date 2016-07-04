@@ -1,20 +1,63 @@
-﻿@model BlogData.Data.Content
+﻿@model BlogData.Data.ContentHistory
 @{
     ViewBag.Title = "Blog Post";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>@Html.Raw(Model.Title)</h1>
+<div class="content">
+    @if (Model != null)
+    {
+        if (Model.ContentStateId.Equals(3))
+        {
+            <div class="col-md-12">
+                <h2>Blog Post Not Available</h2>
+                <p>This blog post has been rejected by the Administrator</p>
+                @if (!string.IsNullOrWhiteSpace(Model.Comment))
+                {
+                    <p><strong>Administrator's Comment:</strong> @Model.Comment</p>
+                }
+            </div>
+        } else if (Model.ContentStateId.Equals(5))
+        {
+            <div class="col-md-12">
+                <h2>Blog Post Not Available</h2>
+                <p>This blog post has been archived</p>
+            </div>
+        }
+        else
+        {
+            <div class="col-md-12">
+                <h1>@Html.Raw(Model.Title)</h1>
 
+                @if (Model.ContentStateId.Equals(2))
+                {
+                    if (Roles.IsUserInRole("Admin"))
+                    {
+                        <div>
+                            This content is ready for Approval. Please click @Html.ActionLink("here", "Publish", new { id = Model.ContentId }) for details.
+                        </div>
+                    }
+                    else
+                    {
+                        <div>
+                            This content is ready for Approval.
+                        </div>
+                    }
+                }
 
+                <div style="padding: 3% 0;">
+                    @Html.Raw(Server.HtmlDecode(Model.MainContent))
+                </div>
 
-<div style="padding:5% 0;">
-    @Html.Raw(Server.HtmlDecode(Model.MainContent))
+                <div>
+                    <p><i>Last Updated @Model.CreatedDate</i></p>
+                </div>
+            </div>
+        }
+    }
+
 </div>
 
-<div>
-   Last Updated: @Html.Raw(Model.PublishDate)
-</div>
 
 
 

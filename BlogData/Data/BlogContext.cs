@@ -16,6 +16,7 @@ namespace BlogData.Data
         public virtual DbSet<AspNetUserClaim> AspNetUserClaims { get; set; }
         public virtual DbSet<AspNetUserLogin> AspNetUserLogins { get; set; }
         public virtual DbSet<AspNetUser> AspNetUsers { get; set; }
+        public virtual DbSet<Author> Authors { get; set; }
         public virtual DbSet<ContentHistory> ContentHistories { get; set; }
         public virtual DbSet<Content> Contents { get; set; }
         public virtual DbSet<ContentState> ContentStates { get; set; }
@@ -42,6 +43,11 @@ namespace BlogData.Data
             modelBuilder.Entity<AspNetUser>()
                 .HasMany(e => e.AspNetUserLogins)
                 .WithRequired(e => e.AspNetUser)
+                .HasForeignKey(e => e.UserId);
+
+            modelBuilder.Entity<AspNetUser>()
+                .HasMany(e => e.Authors)
+                .WithOptional(e => e.AspNetUser)
                 .HasForeignKey(e => e.UserId);
 
             modelBuilder.Entity<Content>()

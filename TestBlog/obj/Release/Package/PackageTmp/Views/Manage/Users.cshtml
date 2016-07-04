@@ -8,6 +8,12 @@
 
 @Html.ActionLink("Add New", "Register", "Account", null, new { @class = "btn btn-primary" })
 
+@if (TempData["User"] != null)
+{
+    <div class="alert alert-success" style="margin-top: 2%;">
+        @TempData["User"]
+    </div>
+}
 
 <table class="table table-striped">
     <thead>
@@ -24,16 +30,55 @@
                 <td>@account.UserName</td>
                 <td>@(account.LockoutEnabled ? "No" : "Yes")</td>
                 <td>
-                    <a href="@Url.Action("Delete", "User")">
-                        <span class="glyphicon glyphicon-trash"></span>
-                    </a>
-                    
-                    <a href="@Url.Action("Edit", "User")">
-                        <span class="glyphicon glyphicon-edit"></span>
-                    </a>
+                    @if (account.LockoutEnabled)
+                    {
+                        <a href="@Url.Action("Activate", "Account", new { id = account.Id})" title="Activate User">
+                            <span class="glyphicon glyphicon-ok"></span>
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="#" class="suspendUser" title="Suspend User"  data-target="#basic" data-toggle="modal" data-id="@account.Id">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </a>
+                    }
                 </td>
             </tr>
         }
     </tbody>
     </table>
-        
+
+
+<div class="modal fade" id="basic" tabindex="-1" role="basic" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Delete Confirmation</h4>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to suspend this user?
+            </div>
+            <div class="modal-footer">
+                <button data-dismiss="modal" type="button" class="btn btn-default">Cancel</button>
+                <button id="btnContinueSuspend" type="button" class="btn btn-primary">Suspend</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+            var postDelete;
+            $(document).ready(function () {
+                $(".suspendUser").click(function (e) {
+                    postDelete = $(this).data('id');
+                });
+                $('#btnContinueSuspend').click(function () {
+                    window.location = "/Account/Suspend/" + postDelete;
+                });
+            });
+    </script>
+}

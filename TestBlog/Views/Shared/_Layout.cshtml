@@ -28,10 +28,20 @@
                     @if (Request.IsAuthenticated)
                     {
                         <li>@Html.ActionLink("Home", "Index", "Blog")</li>
+                        <li>@Html.ActionLink("Manage Blogs", "Manage", "Blog")</li>
                         if (Roles.IsUserInRole("Admin"))
                         {
-                            <li>@Html.ActionLink("Manage Blogs", "Manage", "Blog")</li>
-                            <li>@Html.ActionLink("Manage Users", "Users", "Manage")</li>
+                            <li role="presentation" class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">Manage Users <span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        @Html.ActionLink("Users", "Users", "Manage")
+                                    </li>
+                                    <li>
+                                        @Html.ActionLink("Roles", "UserRoles", "Manage")
+                                    </li>
+                                </ul>
+                            </li>
                         }
                     }
                 </ul>

@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DAL\AuthorDAL.cs" />
     <Compile Include="DAL\ContentHistoryDAL.cs" />
     <Compile Include="DAL\ContentStateToRoleDAL.cs" />
     <Compile Include="DAL\GenericRepository.cs" />
@@ -59,11 +60,13 @@
     <Compile Include="Data\AspNetUser.cs" />
     <Compile Include="Data\AspNetUserClaim.cs" />
     <Compile Include="Data\AspNetUserLogin.cs" />
+    <Compile Include="Data\Author.cs" />
     <Compile Include="Data\BlogContext.cs" />
     <Compile Include="Data\Content.cs" />
     <Compile Include="Data\ContentHistory.cs" />
     <Compile Include="Data\ContentState.cs" />
     <Compile Include="Data\ContentStateToRole.cs" />
+    <Compile Include="Data\ContentStateType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

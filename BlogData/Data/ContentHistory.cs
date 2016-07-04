@@ -15,6 +15,7 @@ namespace BlogData.Data
 
         public int ContentStateId { get; set; }
 
+        [StringLength(250)]
         public string Title { get; set; }
 
         public string MainContent { get; set; }

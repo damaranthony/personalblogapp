@@ -1,29 +1,73 @@
-﻿@model List<BlogData.Data.ContentStateToRole>
+﻿@using BlogData.DAL
+@using Microsoft.AspNet.Identity
+@model List<BlogData.Data.ContentStateToRole>
 @{
     ViewBag.Title = "Permissions";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Permissions</h2>
+<div class="content">
+    <div class="col-md-3">
+        <h2>Permissions</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Blog State</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
 
+                @foreach (var contentState in Model)
+                {
+                    <tr>
+                        <td>@Html.Label(contentState.ContentState.Title, new { @style = "font-weight:normal;" })</td>
+                        <td>@Html.CheckBox(contentState.ContentState.Title, !contentState.IsDeleted.GetValueOrDefault(), new { disabled = "disabled" })</td>
+                    </tr>
+                }
 
-
-<table style="width: 30%;" class="table table-striped">
-    <thead>
-        <tr>
-            <th>Blog State</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-
-        @foreach (var contentState in Model)
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-9">
+        <h2>User Accounts</h2>
+        @if (ViewBag.UserList != null)
         {
-            <tr>
-                <td>@Html.Label(contentState.ContentState.Title, new { @style = "font-weight:normal;" })</td>
-                <td>@Html.CheckBox(contentState.ContentState.Title, !contentState.IsDeleted.GetValueOrDefault(), new { disabled = "disabled"})</td>
-            </tr>
+            <div class="input-group">
+                @Html.DropDownList("Id", new SelectList(ViewBag.UserList, "Id", "Email"), new { @class = "form-control", @id = "userList" })
+                <span class="input-group-btn pull-left"><a href="#" id="assignRole" class="btn btn-primary">Assign to Role</a></span>
+            </div>
         }
-        
-    </tbody>
-    </table>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>User Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    @if (ViewBag.UsersInRole != null)
+                    {
+                        foreach (var r in ViewBag.UsersInRole)
+                        {
+                            var u = new UnitOfWork();
+                            <td>@u.AuthorRepository.GetAuthorName(r.UserId)</td>
+                        }
+                    }
+                </tr>
+            </tbody>
+        </table>
+            </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function () {
+            $('#assignRole').click(function (e) {
+                e.preventDefault();
+                window.location = '/Manage/AssignRole/' + $('#userList').val() + '/@ViewBag.RoleId';
+            });
+        });
+    </script>
+}

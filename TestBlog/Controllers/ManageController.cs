@@ -21,7 +21,7 @@ namespace TestBlog.Controllers
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
 
-        private UnitOfWork _unitOfWork = new UnitOfWork();
+        private readonly UnitOfWork _unitOfWork = new UnitOfWork();
 
         public ManageController()
         {
@@ -289,7 +289,7 @@ namespace TestBlog.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public ActionResult Roles()
+        public ActionResult UserRoles()
         {
             var context = new ApplicationDbContext();
             var roles = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context));
@@ -298,8 +298,28 @@ namespace TestBlog.Controllers
 
         public ActionResult Permissions(string roleid)
         {
+            var context = new ApplicationDbContext();
+            var roleObj = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context)).FindByIdAsync(roleid);
+            ViewBag.UsersInRole = roleObj.Result.Users;
+            ViewBag.UserList = UserManager.Users.ToList().Where(u => !u.Roles.Select(ur => ur.RoleId).Contains(roleObj.Result.Id));
+            ViewBag.RoleId = roleid;
 
-           return string.IsNullOrEmpty(roleid) ? View(new List<ContentStateToRole>()) : View(_unitOfWork.ContentStateToRoleRepository.GetContentStateRolesByRoleId(roleid));
+            return string.IsNullOrEmpty(roleid) ? View(new List<ContentStateToRole>()) : View(_unitOfWork.ContentStateToRoleRepository.GetContentStateRolesByRoleId(roleid));
+        }
+
+        public ActionResult AssignRole(string id, string roleid)
+        {
+            if(string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(roleid)) return RedirectToAction("Permissions");
+
+            var uObj = UserManager.Users.FirstOrDefault(u => u.Id == id);
+            if(uObj == null) return RedirectToAction("Permissions");
+
+            Roles.AddUserToRole(uObj.UserName, roleid);
+
+            TempData["Delete"] = "User has been successfully assigned to role!";
+
+
+            return RedirectToAction("Permissions");
         }
 
         //

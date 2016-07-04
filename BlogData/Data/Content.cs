@@ -18,13 +18,13 @@ namespace BlogData.Data
 
         [StringLength(250)]
         [Required]
+        [Display(Name = "Post Title")]
         public string Title { get; set; }
 
         [Required]
-        [Display(Name = "Blog Post")]
+        [Display(Name = "Main Content")]
         public string MainContent { get; set; }
 
-        [Display(Name = "Publish Date")]
         public DateTime? PublishDate { get; set; }
 
         [StringLength(128)]
@@ -33,12 +33,12 @@ namespace BlogData.Data
         [StringLength(128)]
         public string UpdatedBy { get; set; }
 
-        [StringLength(128)]
-        public string Author { get; set; }
-
         public DateTime? UpdatedDate { get; set; }
 
         public bool? IsDeleted { get; set; }
+
+        [StringLength(250)]
+        public string Author { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ContentHistory> ContentHistories { get; set; }

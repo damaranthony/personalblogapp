@@ -24,6 +24,12 @@ namespace TestBlog
                 "{controller}/{action}/{id}/{title}",
                 new { controller = "Blog", action = "Details", id = UrlParameter.Optional, title = UrlParameter.Optional }
             );
+
+            routes.MapRoute(
+                "Assign Role",
+                "{controller}/{action}/{id}/{roleid}",
+                new { controller = "Manage", action = "AssignRole", id = UrlParameter.Optional, roleid = UrlParameter.Optional }
+            );
         }
     }
 }

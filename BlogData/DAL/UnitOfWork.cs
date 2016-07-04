@@ -18,15 +18,16 @@ namespace BlogData.DAL
         private GenericRepository<Content> _contentRepository;
         private ContentHistoryDal _contentHistoryRepository;
         private GenericRepository<ContentState> _contentStateRepository;
-
         private ContentStateToRoleDal _contentStateToRoleRepository;
+        private AuthorDal _authorRepository; 
        
         //initialize public repository
         public GenericRepository<Content> ContentRepository => _contentRepository ?? (_contentRepository = new GenericRepository<Content>(_context));
         public ContentHistoryDal ContentHistoryRepository => _contentHistoryRepository ?? (_contentHistoryRepository = new ContentHistoryDal(_context));
         public GenericRepository<ContentState> ContentStateRepository => _contentStateRepository ?? (_contentStateRepository = new GenericRepository<ContentState>(_context));
-        
         public ContentStateToRoleDal ContentStateToRoleRepository => _contentStateToRoleRepository ?? (_contentStateToRoleRepository = new ContentStateToRoleDal(_context));
+
+        public AuthorDal AuthorRepository => _authorRepository ?? (_authorRepository = new AuthorDal(_context)); 
 
         public void Save()
         {

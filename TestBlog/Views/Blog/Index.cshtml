@@ -1,17 +1,17 @@
-﻿@model IEnumerable<BlogData.Data.Content>
+﻿@model IEnumerable<BlogData.Data.ContentHistory>
 @{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Blog posts</h2>
+<h2>Blog posts @Html.ActionLink("Add New", "Create", "Blog", null, new { @class = "btn btn-primary" })</h2> 
 
 @if (Model.Any())
 {
     foreach (var b in Model)
     {
         <div>
-            <h3>@Html.ActionLink(b.Title, "Details", new { id = b.Id })</h3>
+            <h3>@Html.ActionLink(b.Title, "Details", new { id = b.ContentId })</h3>
 
             @(b.MainContent.Length > 100 ? Html.Raw(Server.HtmlDecode(b.MainContent.Substring(0, 100) + " ...")) : Html.Raw(Server.HtmlDecode(b.MainContent)))
         </div>

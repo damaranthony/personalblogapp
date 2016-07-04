@@ -21,22 +21,29 @@ namespace TestBlog.Controllers
         //main blog post page
         public ActionResult Index()
         {
-            return View(_blogUnitOfWork.ContentRepository.GetAll());
+            //admin - display all active blog posts
+            //non-admin - display active blog posts by user id
+            var blogContents = _blogUnitOfWork.ContentRepository.GetAll().Where(b => b.IsDeleted.GetValueOrDefault() == false && b.PublishDate <= DateTime.Now);
+            
+            return View(Roles.IsUserInRole("Admin") ? _blogUnitOfWork.ContentHistoryRepository.GetPublishedPosts(blogContents) : _blogUnitOfWork.ContentHistoryRepository.GetPublishedPosts(blogContents.Where(b => b.PublishedBy == User.Identity.GetUserId())));
         }
 
-        //manage blog posts
-        //to do: authorize admin only
+        
         public ActionResult Manage()
         {
-            return View(_blogUnitOfWork.ContentRepository.GetAll());
+            return (Roles.IsUserInRole("Admin")) ? View(_blogUnitOfWork.ContentRepository.GetAll().Where(b => !b.IsDeleted.GetValueOrDefault())) : View(_blogUnitOfWork.ContentRepository.GetAll().Where(b => b.PublishedBy == User.Identity.GetUserId() && !b.IsDeleted.GetValueOrDefault()));
         }
-
-        // GET: Blog/Details/5
+        
         public ActionResult Details(int? id)
         {
             //check if url parameter has a value
-            //return blog post details if there's an id
-            return id == null ? View() : View(_blogUnitOfWork.ContentRepository.GetById(id));
+            //return blog post details if there's an id 
+
+            if (id == null) return View();
+
+            var cHistory = _blogUnitOfWork.ContentHistoryRepository.GetLatestContentHistory(id.Value);
+            
+            return View(cHistory);
         }
 
         // GET: Blog/Create
@@ -59,10 +66,15 @@ namespace TestBlog.Controllers
                     {
                         case "Save as Draft":
                             SaveBlogPost(blogPost, ContentStateType.Draft);
+                            TempData["Draft"] = "Your blog post has been saved as Draft!";
                             return RedirectToAction("Edit", new { id = blogPost.Id });
                         case "Publish":
                             SaveBlogPost(blogPost, ContentStateType.ReadyToPublish);
-                            return RedirectToAction("Publish", new { id = blogPost.Id, title = blogPost.Title });
+                            if (Roles.IsUserInRole("Admin"))
+                                return RedirectToAction("Publish", new {id = blogPost.Id});
+
+                            TempData["Publish"] = "Your content has been submitted for approval!";
+                            return RedirectToAction("Edit", new { id = blogPost.Id });
                         default: //cancel
                             return RedirectToAction("Manage", "Blog");
                     }
@@ -79,22 +91,24 @@ namespace TestBlog.Controllers
 
         
         // GET: Blog/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit(int? id)
         {
             try
             {
-                var blogPostHistory = _blogUnitOfWork.ContentHistoryRepository.GetLatestContentHistory(id);
+                if (id != null)
+                {
+                    var blogPostHistory = _blogUnitOfWork.ContentHistoryRepository.GetLatestContentHistory(id.Value);
 
-                if (blogPostHistory == null) return View();
-                //check if the content is ready for review
-                if(blogPostHistory.ContentState.Title == "Ready to publish")
-                    return RedirectToAction("Publish", new { id = blogPostHistory.ContentId, title = blogPostHistory.Title });
+                    if (blogPostHistory == null) return View();
+                    //check if the content is ready for review
+                    if(blogPostHistory.ContentState.Id.Equals(2) && Roles.IsUserInRole("Admin"))
+                        return RedirectToAction("Publish", new { id = blogPostHistory.ContentId });
+                }
 
                 var blogPost = _blogUnitOfWork.ContentRepository.GetById(id);
                 blogPost.MainContent = HttpContext.Server.HtmlDecode(blogPost.MainContent);
 
                 return View(blogPost);
-               
             }
             catch
             {
@@ -106,74 +120,102 @@ namespace TestBlog.Controllers
         public ActionResult Publish(int? id)
         {
             if (id == null) return View();
-
             var blogPostHistory = _blogUnitOfWork.ContentHistoryRepository.GetLatestContentHistory(id.Value);
-            
-            if(blogPostHistory.ContentState.Title == "Published")
-                return RedirectToAction("Details", new { id = blogPostHistory.ContentId, title = blogPostHistory.Title });
-            else
-                return View(_blogUnitOfWork.ContentRepository.GetById(id));
+            //redirect to details page if not ready for publish state
+            if (!blogPostHistory.ContentState.Id.Equals(2)) 
+                return RedirectToAction("Details", new {id = blogPostHistory.ContentId, title = blogPostHistory.Title});
+
+            var blogModel = new BlogViewModel
+            {
+                Title = blogPostHistory.Title,
+                Content = blogPostHistory.MainContent,
+                Comment = blogPostHistory.Comment,
+                UpdatedDate = blogPostHistory.Content.UpdatedDate.GetValueOrDefault(),
+                PublishDate = blogPostHistory.Content.PublishDate ?? DateTime.Now,
+                Id = blogPostHistory.ContentId
+            };
+
+            return View(blogModel);
         }
 
-        //to do: authorize for admin only
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Publish(Content blogPost)
+        [Authorize(Roles = "Admin")]
+        public ActionResult Publish(BlogViewModel blogPost, string submit)
         {
             try
             {
-                var tempPost = _blogUnitOfWork.ContentRepository.GetById(blogPost.Id);
-
-                if (tempPost == null) return View();
-
-                tempPost.PublishDate = blogPost?.PublishDate ?? DateTime.Now;
-                tempPost.UpdatedBy = User.Identity.GetUserId();
-                tempPost.UpdatedDate = DateTime.Now;
-
-                _blogUnitOfWork.ContentRepository.Update(tempPost);
-
-                var blogHistory = new ContentHistory
+                if (ModelState.IsValid)
                 {
-                    ContentId = blogPost.Id, //check if record exist
-                    CreatedBy = User.Identity.GetUserId(),
-                    CreatedDate = DateTime.Now,
-                    ContentStateId = 4 //published
-                };
+                    if(submit.Equals("Cancel")) return RedirectToAction("Manage");
 
-                _blogUnitOfWork.ContentHistoryRepository.Insert(blogHistory);
-                _blogUnitOfWork.Save();
+                    var tempPost = _blogUnitOfWork.ContentRepository.GetById(blogPost.Id);
+
+                    if (tempPost == null) return View();
+
+                    tempPost.PublishDate = blogPost.PublishDate;
+                    tempPost.UpdatedBy = User.Identity.GetUserId();
+                    tempPost.UpdatedDate = DateTime.Now;
+
+                    _blogUnitOfWork.ContentRepository.Update(tempPost);
+
+                    var blogHistory = new ContentHistory
+                    {
+                        ContentId = blogPost.Id,
+                        CreatedBy = User.Identity.GetUserId(),
+                        Title = tempPost.Title,
+                        MainContent = tempPost.MainContent,
+                        Comment = blogPost.Comment,
+                        CreatedDate = DateTime.Now,
+                        ContentStateId = submit.Equals("Approve") ? 4 : 3  //4 - published, 3 - rejected
+                    };
+
+                    _blogUnitOfWork.ContentHistoryRepository.Insert(blogHistory);
+                    _blogUnitOfWork.Save();
 
 
-                return RedirectToAction("Details", new { id = tempPost.Id, title = tempPost.Title });
+                    return RedirectToAction("Details", new { id = tempPost.Id });
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                ModelState.AddModelError("", ex.Message);
             }
-        }
 
-        // GET: Blog/Delete/5
-        public ActionResult Delete(int id)
-        {
             return View();
         }
 
-        // POST: Blog/Delete/5
-        [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
+        public ActionResult Delete(int id)
         {
-            try
+            var tempPost = _blogUnitOfWork.ContentRepository.GetById(id);
+
+            if (tempPost == null) return RedirectToAction("Manage");
+
+            var blogHistory = new ContentHistory
             {
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
+                ContentId = tempPost.Id,
+                CreatedBy = User.Identity.GetUserId(),
+                Title = tempPost.Title,
+                MainContent = tempPost.MainContent,
+                CreatedDate = DateTime.Now,
+                ContentStateId = 5 //archived
+            };
+
+            _blogUnitOfWork.ContentHistoryRepository.Insert(blogHistory);
+
+            tempPost.UpdatedDate = DateTime.Now;
+            tempPost.UpdatedBy = User.Identity.GetUserId();
+            tempPost.IsDeleted = true;
+                
+            _blogUnitOfWork.Save();
+
+            TempData["Delete"] = "Blog Post <strong>" + tempPost.Title + "</strong> has been successfully deleted!";
+
+
+            return RedirectToAction("Manage");
         }
-
-
-
+        
         private void SaveBlogPost(Content blogPost, ContentStateType cType)
         {
             var tempBlog = _blogUnitOfWork.ContentRepository.GetById(blogPost.Id);
@@ -196,12 +238,16 @@ namespace TestBlog.Controllers
             {
                 //insert record
                 blogPost.PublishedBy = User.Identity.GetUserId();
+                blogPost.PublishDate = DateTime.Now;
                 //encode blog post content before saving to DB for security
                 blogPost.MainContent = Server.HtmlEncode(blogPost.MainContent);
                 blogPost.IsDeleted = false;
+                blogPost.Author = _blogUnitOfWork.AuthorRepository.GetAuthorName(User.Identity.GetUserId());
 
                 _blogUnitOfWork.ContentRepository.Insert(blogPost);
             }
+
+            _blogUnitOfWork.Save();
 
             //create new history record to handle latest content state
             var blogHistory = new ContentHistory
@@ -215,7 +261,6 @@ namespace TestBlog.Controllers
             };
 
             _blogUnitOfWork.ContentHistoryRepository.Insert(blogHistory);
-
             _blogUnitOfWork.Save();
         }
     }
