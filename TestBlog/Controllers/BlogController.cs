@@ -23,7 +23,7 @@ namespace TestBlog.Controllers
         {
             //admin - display all active blog posts
             //non-admin - display active blog posts by user id
-            var blogContents = _blogUnitOfWork.ContentRepository.GetAll().Where(b => b.IsDeleted.GetValueOrDefault() == false && b.PublishDate <= DateTime.Now);
+            var blogContents = _blogUnitOfWork.ContentRepository.GetAll().Where(b => !b.IsDeleted.GetValueOrDefault() && b.PublishDate <= DateTime.Now);
             
             return View(Roles.IsUserInRole("Admin") ? _blogUnitOfWork.ContentHistoryRepository.GetPublishedPosts(blogContents) : _blogUnitOfWork.ContentHistoryRepository.GetPublishedPosts(blogContents.Where(b => b.PublishedBy == User.Identity.GetUserId())));
         }
@@ -127,7 +127,7 @@ namespace TestBlog.Controllers
 
             var blogModel = new BlogViewModel
             {
-                Title = blogPostHistory.Title,
+                Title = blogPostHistory.Title.ToTitleCase(),
                 Content = blogPostHistory.MainContent,
                 Comment = blogPostHistory.Comment,
                 UpdatedDate = blogPostHistory.Content.UpdatedDate.GetValueOrDefault(),
@@ -164,7 +164,7 @@ namespace TestBlog.Controllers
                     {
                         ContentId = blogPost.Id,
                         CreatedBy = User.Identity.GetUserId(),
-                        Title = tempPost.Title,
+                        Title = tempPost.Title.ToTitleCase(),
                         MainContent = tempPost.MainContent,
                         Comment = blogPost.Comment,
                         CreatedDate = DateTime.Now,
@@ -196,7 +196,7 @@ namespace TestBlog.Controllers
             {
                 ContentId = tempPost.Id,
                 CreatedBy = User.Identity.GetUserId(),
-                Title = tempPost.Title,
+                Title = tempPost.Title.ToTitleCase(),
                 MainContent = tempPost.MainContent,
                 CreatedDate = DateTime.Now,
                 ContentStateId = 5 //archived
@@ -210,7 +210,7 @@ namespace TestBlog.Controllers
                 
             _blogUnitOfWork.Save();
 
-            TempData["Delete"] = "Blog Post <strong>" + tempPost.Title + "</strong> has been successfully deleted!";
+            TempData["Delete"] = "Blog Post " + tempPost.Title + " has been successfully deleted!";
 
 
             return RedirectToAction("Manage");
@@ -226,7 +226,7 @@ namespace TestBlog.Controllers
                 tempBlog.UpdatedBy = User.Identity.GetUserId();
                 tempBlog.UpdatedDate = DateTime.Now;
                 tempBlog.IsDeleted = false;
-                tempBlog.Title = blogPost.Title;
+                tempBlog.Title = blogPost.Title.ToTitleCase();
                 tempBlog.PublishDate = blogPost.PublishDate;
                 tempBlog.PublishedBy = User.Identity.GetUserId();
                 //encode blog post content before saving to DB for security
@@ -241,6 +241,7 @@ namespace TestBlog.Controllers
                 blogPost.PublishDate = DateTime.Now;
                 //encode blog post content before saving to DB for security
                 blogPost.MainContent = Server.HtmlEncode(blogPost.MainContent);
+                blogPost.Title = blogPost.Title.ToTitleCase();
                 blogPost.IsDeleted = false;
                 blogPost.Author = _blogUnitOfWork.AuthorRepository.GetAuthorName(User.Identity.GetUserId());
 
@@ -255,7 +256,7 @@ namespace TestBlog.Controllers
                 ContentId = tempBlog?.Id ?? blogPost.Id, //check if record exist
                 CreatedBy = User.Identity.GetUserId(),
                 MainContent = Server.HtmlEncode(blogPost.MainContent),
-                Title = blogPost.Title,
+                Title = blogPost.Title.ToTitleCase(),
                 CreatedDate = DateTime.Now,
                 ContentStateId = cType == ContentStateType.Draft ? 1 : 2 //check if save for draft or publish
             };

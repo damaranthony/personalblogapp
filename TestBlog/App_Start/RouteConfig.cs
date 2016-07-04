@@ -25,11 +25,19 @@ namespace TestBlog
                 new { controller = "Blog", action = "Details", id = UrlParameter.Optional, title = UrlParameter.Optional }
             );
 
+           
+
             routes.MapRoute(
                 "Assign Role",
-                "{controller}/{action}/{id}/{roleid}",
+                "{controller}/{action}/id/{id}/role/{roleid}",
                 new { controller = "Manage", action = "AssignRole", id = UrlParameter.Optional, roleid = UrlParameter.Optional }
             );
+
+            routes.MapRoute(
+               "Remove Role",
+               "{controller}/{action}/uid/{uid}/role/{roleid}",
+               new { controller = "Manage", action = "RemoveFromRole", uid = UrlParameter.Optional, roleid = UrlParameter.Optional }
+           );
         }
     }
 }

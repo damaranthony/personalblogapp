@@ -19,9 +19,6 @@
             <tr>
                 <td>@r.Name</td>
                 <td>
-                    <a href="@Url.Action("Permissions", "Manage", new {roleid = r.Id})" title="View Permissions">
-                        <span class="glyphicon glyphicon-wrench"></span>
-                    </a>
                     <a href="@Url.Action("Permissions", "Manage", new { roleid = r.Id })" title="Manage User">
                         <span class="glyphicon glyphicon-user"></span>
                     </a>

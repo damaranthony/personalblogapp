@@ -28,6 +28,7 @@
         {
             <div class="col-md-12">
                 <h1>@Html.Raw(Model.Title)</h1>
+                <i>by @Model.Content.Author</i>
 
                 @if (Model.ContentStateId.Equals(2))
                 {

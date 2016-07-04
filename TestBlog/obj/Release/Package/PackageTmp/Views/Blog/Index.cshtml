@@ -1,4 +1,5 @@
-﻿@model IEnumerable<BlogData.Data.ContentHistory>
+﻿@using BlogData.DAL
+@model IEnumerable<BlogData.Data.ContentHistory>
 @{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -12,8 +13,7 @@
     {
         <div>
             <h3>@Html.ActionLink(b.Title, "Details", new { id = b.ContentId })</h3>
-
-            @(b.MainContent.Length > 100 ? Html.Raw(Server.HtmlDecode(b.MainContent.Substring(0, 100) + " ...")) : Html.Raw(Server.HtmlDecode(b.MainContent)))
+            <i>by @b.Content.Author</i>
         </div>
     }
 }

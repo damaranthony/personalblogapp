@@ -29,11 +29,10 @@ namespace BlogData.DAL
         {
             //get contents from history by content ID
             //check content if active
-            //check publish date if later than or equal to current date and time
             //get all contents with published content state
             var contentHistory = DbSet.Where(b => b.ContentStateId.Equals(4)).ToList();
-
-            return contentHistory.Where(b => blogContents.Select(c => c.Id).Contains(b.ContentId));
+            //group all contents by latest created date
+            return contentHistory.Where(b => blogContents.Select(c => c.Id).Contains(b.ContentId)).GroupBy(b => b.ContentId).Select(b => b.OrderByDescending(bp => bp.CreatedDate).First());
         }
 
     }

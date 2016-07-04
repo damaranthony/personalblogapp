@@ -55,6 +55,7 @@
     <Compile Include="DAL\ContentHistoryDAL.cs" />
     <Compile Include="DAL\ContentStateToRoleDAL.cs" />
     <Compile Include="DAL\GenericRepository.cs" />
+    <Compile Include="DAL\Helper.cs" />
     <Compile Include="DAL\UnitOfWork.cs" />
     <Compile Include="Data\AspNetRole.cs" />
     <Compile Include="Data\AspNetUser.cs" />

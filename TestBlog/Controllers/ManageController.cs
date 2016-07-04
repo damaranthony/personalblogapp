@@ -296,30 +296,58 @@ namespace TestBlog.Controllers
             return View(roles.Roles);
         }
 
+        [Route("roleid/{roleid}")]
         public ActionResult Permissions(string roleid)
         {
             var context = new ApplicationDbContext();
             var roleObj = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context)).FindByIdAsync(roleid);
-            ViewBag.UsersInRole = roleObj.Result.Users;
+            //get users in current role
+            ViewBag.UsersInRole = UserManager.Users.ToList().Where(u => u.Roles.Select(ur => ur.RoleId).Contains(roleObj.Result.Id));
+            //get users not in the role
             ViewBag.UserList = UserManager.Users.ToList().Where(u => !u.Roles.Select(ur => ur.RoleId).Contains(roleObj.Result.Id));
             ViewBag.RoleId = roleid;
-
             return string.IsNullOrEmpty(roleid) ? View(new List<ContentStateToRole>()) : View(_unitOfWork.ContentStateToRoleRepository.GetContentStateRolesByRoleId(roleid));
         }
 
+        [Route("id/{id}/role/{roleid}")]
         public ActionResult AssignRole(string id, string roleid)
         {
-            if(string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(roleid)) return RedirectToAction("Permissions");
+            if(string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(roleid)) return RedirectToAction("Permissions",  new { roleid });
 
             var uObj = UserManager.Users.FirstOrDefault(u => u.Id == id);
             if(uObj == null) return RedirectToAction("Permissions");
 
-            Roles.AddUserToRole(uObj.UserName, roleid);
+            var context = new ApplicationDbContext();
+            var roleObj = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context)).FindByIdAsync(roleid);
 
-            TempData["Delete"] = "User has been successfully assigned to role!";
+
+            if (roleObj.Result.Users.All(r => r.UserId == id)) return RedirectToAction("Permissions", new {roleid});
+
+            UserManager.AddToRole(id, roleObj.Result.Name);
+
+            TempData["UserRoleAssign"] = "User has been successfully assigned to role!";
+
+            return RedirectToAction("Permissions", new { roleid });
+        }
+
+        [Route("uid/{uid}/role/{roleid}")]
+        public ActionResult RemoveFromRole(string uid, string roleid)
+        {
+            if (string.IsNullOrWhiteSpace(uid) || string.IsNullOrWhiteSpace(roleid)) return RedirectToAction("Permissions", new { roleid });
+
+            var uObj = UserManager.Users.FirstOrDefault(u => u.Id == uid);
+            if (uObj == null) return RedirectToAction("Permissions");
+
+            var context = new ApplicationDbContext();
+            var roleObj = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context)).FindByIdAsync(roleid);
 
 
-            return RedirectToAction("Permissions");
+            if (roleObj.Result.Users.All(r => r.UserId == uid)) return RedirectToAction("Permissions", new { roleid });
+            
+            UserManager.RemoveFromRole(uid, roleObj.Result.Name);
+            TempData["UserRoleAssign"] = "User has been removed from the role!";
+
+            return RedirectToAction("Permissions", new { roleid });
         }
 
         //
