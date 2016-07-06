@@ -1,5 +1,4 @@
 ﻿@using BlogData.DAL
-@using Microsoft.AspNet.Identity
 @model List<BlogData.Data.ContentStateToRole>
 @{
     ViewBag.Title = "Permissions";
@@ -17,15 +16,16 @@
             </tr>
             </thead>
             <tbody>
-
-            @foreach (var contentState in Model)
+            @if (Model != null)
             {
-                <tr>
-                    <td>@Html.Label(contentState.ContentState.Title, new {@style = "font-weight:normal;"})</td>
-                    <td>@Html.CheckBox(contentState.ContentState.Title, !contentState.IsDeleted.GetValueOrDefault(), new {disabled = "disabled"})</td>
-                </tr>
+                foreach (var contentState in Model)
+                {
+                    <tr>
+                        <td>@Html.Label(contentState.ContentState.Title, new { @style = "font-weight:normal;" })</td>
+                        <td>@Html.CheckBox(contentState.ContentState.Title, !contentState.IsDeleted.GetValueOrDefault(), new { disabled = "disabled" })</td>
+                    </tr>
+                }
             }
-
             </tbody>
         </table>
     </div>

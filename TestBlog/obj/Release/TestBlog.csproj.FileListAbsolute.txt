@@ -68,3 +68,4 @@ F:\Test Project\Repository\testblog\TestBlog\bin\Microsoft.Owin.Security.Twitter
 F:\Test Project\Repository\testblog\TestBlog\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
 F:\Test Project\Repository\testblog\TestBlog\obj\Release\TestBlog.dll
 F:\Test Project\Repository\testblog\TestBlog\obj\Release\TestBlog.pdb
+F:\Test Project\Repository\testblog\TestBlog\obj\Release\TestBlog.csprojResolveAssemblyReference.cache

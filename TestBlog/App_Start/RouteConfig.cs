@@ -25,7 +25,11 @@ namespace TestBlog
                 new { controller = "Blog", action = "Details", id = UrlParameter.Optional, title = UrlParameter.Optional }
             );
 
-           
+            routes.MapRoute(
+                 "Manage Permission",
+                 "{controller}/{action}/role/{roleid}",
+                 new { controller = "Manage", action = "Permissions", roleid = UrlParameter.Optional }
+             );
 
             routes.MapRoute(
                 "Assign Role",
