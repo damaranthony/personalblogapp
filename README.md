@@ -1,7 +1,21 @@
 # Test Blog Application
 
-My goals for this test blog application: 1) To use Unit of Work design pattern 2) To implement a workflow system for the blog (i.e. Approval and Rejection based on user roles) 
+<strong>My goals for this test blog application: </strong>
+<ol>
+ <li>To use Unit of Work design pattern</li> 
+ <li>To implement a workflow system for the blog (i.e. Approval and Rejection based on user roles) </li>
+</ol>
 
-The entire site is built using these technologies: 1) ASP.NET MVC 5 2) Entity Framework 6 (Code First) 3) Twitter Bootsrap (HTML/Javascript/CSS) 4) jQuery
+<strong>The entire site is built using these technologies:</strong> 
+	<ol>
+ 		<li>ASP.NET MVC 5 </li>
+ 		<li>Entity Framework 6 (Code First) </li>
+  	<li>Twitter Bootsrap (HTML/Javascript/CSS) </li>
+ 		<li>jQuery</li>
+ 	</ol>
 
-To improve: 1) Look and feel of the workflow system 2) Assigning of roles into specific part of the workflow system
+<strong>To improve:</strong>
+<ol>
+	<li>Look and feel of the workflow system</li>
+	<li>Assigning of roles into specific part of the workflow system</li>
+</ol>
