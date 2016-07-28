@@ -1,9 +1,10 @@
-# Test Blog Application
+# Personal Blog Application
 
 <strong>My goals for this test blog application: </strong>
 <ol>
  <li>To use Unit of Work design pattern</li> 
  <li>To implement a workflow system for the blog (i.e. Approval and Rejection based on user roles) </li>
+ <li>For the blog site to have its own user and roles management capabilities </li>
 </ol>
 
 <strong>The entire site is built using these technologies:</strong> 
